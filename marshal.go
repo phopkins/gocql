@@ -84,8 +84,8 @@ func Unmarshal(info *TypeInfo, data []byte, value interface{}) error {
 		return unmarshalList(info, data, value)
 	case TypeMap:
 		return unmarshalMap(info, data, value)
-	case TypeTimeUUID:
-		return unmarshalTimeUUID(info, data, value)
+	case TypeTimeUUID, TypeUUID:
+		return unmarshalUUID(info, data, value)
 	case TypeInet:
 		return unmarshalInet(info, data, value)
 	}
@@ -912,7 +912,7 @@ func marshalUUID(info *TypeInfo, value interface{}) ([]byte, error) {
 	return nil, marshalErrorf("can not marshal %T into %s", value, info)
 }
 
-func unmarshalTimeUUID(info *TypeInfo, data []byte, value interface{}) error {
+func unmarshalUUID(info *TypeInfo, data []byte, value interface{}) error {
 	switch v := value.(type) {
 	case Unmarshaler:
 		return v.UnmarshalCQL(info, data)
