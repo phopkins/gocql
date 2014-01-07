@@ -903,6 +903,13 @@ func unmarshalMap(info *TypeInfo, data []byte, value interface{}) error {
 }
 
 func marshalUUID(info *TypeInfo, value interface{}) ([]byte, error) {
+	if val, ok := value.(string); ok {
+		parsed, err := uuid.ParseUUID(val)
+		if err != nil {
+			return nil, err
+		}
+		return parsed.Bytes(), nil
+	}
 	if val, ok := value.([]byte); ok && len(val) == 16 {
 		return val, nil
 	}
@@ -918,6 +925,9 @@ func unmarshalUUID(info *TypeInfo, data []byte, value interface{}) error {
 		return v.UnmarshalCQL(info, data)
 	case *uuid.UUID:
 		*v = uuid.FromBytes(data)
+		return nil
+	case *string:
+		*v = uuid.FromBytes(data).String()
 		return nil
 	case *time.Time:
 		if len(data) != 16 {
