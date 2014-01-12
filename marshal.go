@@ -909,6 +909,13 @@ func marshalUUID(info *TypeInfo, value interface{}) ([]byte, error) {
 	if val, ok := value.(UUID); ok {
 		return val.Bytes(), nil
 	}
+	if val, ok := value.(string); ok {
+		u, err := ParseUUID(val)
+		if err != nil {
+			return nil, err
+		}
+		return u.Bytes(), nil
+	}
 	return nil, marshalErrorf("can not marshal %T into %s", value, info)
 }
 
@@ -918,6 +925,9 @@ func unmarshalUUID(info *TypeInfo, data []byte, value interface{}) error {
 		return v.UnmarshalCQL(info, data)
 	case *UUID:
 		*v = UUIDFromBytes(data)
+		return nil
+	case *string:
+		*v = UUIDFromBytes(data).String()
 		return nil
 	}
 	return unmarshalErrorf("can not unmarshal %s into %T", info, value)
